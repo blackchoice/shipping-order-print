@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light;
+  --bg: #e8e4d9;
+  --paper: #f7f1c8;
+  --ink: #1a1a1a;
+  --line: #8a8470;
+  --accent: #2c5f2d;
+  --danger: #8b1e1e;
+  --panel: #faf8f2;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(160deg, #d9d2c0 0%, #ebe6da 45%, #cfc8b4 100%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}

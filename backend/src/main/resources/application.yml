@@ -1,0 +1,56 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: shipping-order-print
+
+# Fujitsu DPK700H — set printer-name to the exact Windows printer name
+print:
+  printer-name: "NFCP DPK700"
+  encoding: GBK
+  page:
+    # 实物连续纸 241×93mm（宽×高）
+    width-mm: 241
+    height-mm: 93
+    # 字距：12 CPI（ESC M）或 10 CPI（ESC P）。预览也按这个值定标字宽
+    cpi: 12
+    # 12 CPI：扣齿孔约 215mm → ~100 列（可铺满；84@名义10CPI 在默认12CPI 上约 75%）
+    cols: 100
+    # 打印机左边距补偿（ESC l）：实际打印偏左时加大；预览仍居中，不受此项影响
+    left-margin-mm: 8
+    condensed: false
+    # 标题双宽+双高（按半幅排版，打出来仍是整幅宽）
+    title-double-size: true
+    # 客户名称/单号/日期行双高；这行本来就快占满纸宽，再双宽会被截断
+    meta-double-height: true
+    meta-bold: true
+    title-bold: true
+    title-gap-lines: 0
+    # 纸面顶端到标题的留白（ESC J，在首行前走纸）
+    top-margin-mm: 6
+    # 标题与客户信息行之间的额外间距（ESC J，比整行更细）
+    title-gap-mm: 2
+    # 送货人/收货人行高 = 1.5 行（多打一行只有竖线的空行，竖线不断）
+    sign-row-height: 1.5
+    # ESC 3 n（n/180 英寸）。汉字字身 24 点；取 22 让上下行略微重叠，
+    # 竖线才能连到格子底端。竖线若仍有断点就再降（20~23 之间调）。
+    line-spacing-n: 20
+    # 0 = 按 height-mm 与行距推算整张纸的行数
+    page-length-lines: 0
+    # 仅当内容装不下 93mm 时才自动压行距
+    fit-to-form: true
+    # 行结束符：crlf / lf / cr
+    # crlf 需要打印机面板或 DIP 开关关闭 AUTO LF，否则每行走两行、单据会溢到下一张
+    line-ending: crlf
+    form-feed: true
+  table:
+    col-index: 10
+    col-name: 28
+    col-unit: 8
+    col-qty: 10
+    col-price: 12
+    col-amount: 14
+    col-remark: 20
+    max-rows: 7
+    pad-empty-rows: true

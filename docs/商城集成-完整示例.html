@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商城订单打印 - 集成示例</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #F5EFE6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: #2B1D14;
+      color: #F5EFE6;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      opacity: 0.8;
+      font-size: 0.9rem;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #D5CDB8;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      color: #2B1D14;
+    }
+
+    .order-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: #5C3D2E;
+      font-weight: 500;
+    }
+
+    .info-value {
+      font-size: 1rem;
+      color: #2B1D14;
+      padding: 8px 10px;
+      background: #F5EFE6;
+      border: 1px solid #D5CDB8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #D5CDB8;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #5C3D2E;
+      color: white;
+      font-weight: 500;
+    }
+
+    tr:nth-child(even) {
+      background: #F5EFE6;
+    }
+
+    .total-row {
+      font-weight: 600;
+      background: #B96420 !important;
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #B96420;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #A35518;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #2B1D14;
+      border: 1px solid #5C3D2E;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #F5EFE6;
+    }
+
+    .status {
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .service-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: #F5EFE6;
+      border: 1px solid #D5CDB8;
+      margin-bottom: 16px;
+    }
+
+    .service-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .service-status.online {
+      background: #28a745;
+      box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+    }
+
+    .service-status.offline {
+      background: #dc3545;
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>商城订单管理系统</h1>
+      <p>订单详情 - 打印集成示例</p>
+    </div>
+
+    <div class="panel">
+      <h2>订单信息</h2>
+
+      <div class="service-check">
+        <div class="service-status" id="serviceStatus"></div>
+        <span id="serviceStatusText">检查打印服务...</span>
+      </div>
+
+      <div class="order-info">
+        <div class="info-item">
+          <div class="info-label">订单号</div>
+          <div class="info-value" id="orderNo">XS-202607010206</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">客户名称</div>
+          <div class="info-value" id="customerName">本部食堂</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">订单日期</div>
+          <div class="info-value" id="orderDate">2026-07-01</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">送货人</div>
+          <div class="info-value" id="deliverer">张三</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">收货人</div>
+          <div class="info-value" id="receiver">李四</div>
+        </div>
+      </div>
+
+      <h2>订单明细</h2>
+      <table id="orderTable">
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>商品名称</th>
+            <th style="width: 80px;">单位</th>
+            <th class="num" style="width: 100px;">数量</th>
+            <th class="num" style="width: 120px;">单价</th>
+            <th class="num" style="width: 120px;">金额</th>
+            <th style="width: 150px;">备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>牛腩</td>
+            <td>公斤</td>
+            <td class="num">4.00</td>
+            <td class="num">70.00</td>
+            <td class="num">280.00</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>牛腱子</td>
+            <td>公斤</td>
+            <td class="num">2.00</td>
+            <td class="num">80.00</td>
+            <td class="num">160.00</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>排骨</td>
+            <td>公斤</td>
+            <td class="num">5.00</td>
+            <td class="num">45.00</td>
+            <td class="num">225.00</td>
+            <td>新鲜</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="5" style="text-align: right;">合计</td>
+            <td class="num" id="totalAmount">665.00</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="handlePrint()" id="printBtn">
+          打印出货单
+        </button>
+        <button class="btn-secondary" onclick="handlePreview()">
+          预览版式
+        </button>
+        <button class="btn-secondary" onclick="checkPrintService()">
+          检查打印服务
+        </button>
+      </div>
+
+      <div class="status" id="statusMessage"></div>
+    </div>
+  </div>
+
+  <!-- 引入打印客户端库 -->
+  <script src="商城集成-JavaScript客户端.js"></script>
+
+  <script>
+    // 从页面提取订单数据
+    function extractOrderData() {
+      const rows = document.querySelectorAll('#orderTable tbody tr');
+      const items = [];
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 7) {
+          items.push({
+            productName: cells[1].textContent.trim(),
+            unit: cells[2].textContent.trim(),
+            quantity: parseFloat(cells[3].textContent) || 0,
+            unitPrice: parseFloat(cells[4].textContent) || 0,
+            remark: cells[6].textContent.trim()
+          });
+        }
+      });
+
+      return {
+        orderNo: document.getElementById('orderNo').textContent.trim(),
+        customerName: document.getElementById('customerName').textContent.trim(),
+        date: document.getElementById('orderDate').textContent.trim(),
+        deliverer: document.getElementById('deliverer').textContent.trim(),
+        receiver: document.getElementById('receiver').textContent.trim(),
+        items: items
+      };
+    }
+
+    // 显示状态消息
+    function showStatus(message, isSuccess) {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `status show ${isSuccess ? 'success' : 'error'}`;
+
+      // 5秒后自动隐藏
+      setTimeout(() => {
+        statusEl.classList.remove('show');
+      }, 5000);
+    }
+
+    // 打印处理
+    async function handlePrint() {
+      const printBtn = document.getElementById('printBtn');
+      printBtn.disabled = true;
+      printBtn.textContent = '打印中...';
+
+      try {
+        const orderData = extractOrderData();
+        const result = await ShippingPrintClient.printOrder(orderData);
+
+        if (result.success) {
+          showStatus(`✓ ${result.message} → ${result.printerName}`, true);
+        } else {
+          showStatus(`✗ ${result.message}`, false);
+        }
+      } catch (error) {
+        showStatus(`✗ 打印失败: ${error.message}`, false);
+      } finally {
+        printBtn.disabled = false;
+        printBtn.textContent = '打印出货单';
+      }
+    }
+
+    // 预览处理
+    async function handlePreview() {
+      try {
+        const orderData = extractOrderData();
+        const layout = await ShippingPrintClient.previewLayout(orderData);
+
+        // 在新窗口显示预览
+        const previewWindow = window.open('', '_blank', 'width=800,height=600');
+        previewWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>打印预览</title>
+            <style>
+              body {
+                margin: 0;
+                padding: 20px;
+                background: #f5f5f5;
+                font-family: monospace;
+              }
+              .preview {
+                background: white;
+                padding: 20px;
+                white-space: pre;
+                border: 1px solid #ccc;
+                overflow-x: auto;
+              }
+            </style>
+          </head>
+          <body>
+            <h2>打印预览（等宽字体）</h2>
+            <div class="preview">${layout.lines.join('\n')}</div>
+            <p>总列宽: ${layout.pageWidthChars} 字符</p>
+            <p>总行数: ${layout.totalLines} 行</p>
+          </body>
+          </html>
+        `);
+        previewWindow.document.close();
+
+        showStatus('预览已在新窗口打开', true);
+      } catch (error) {
+        showStatus(`预览失败: ${error.message}`, false);
+      }
+    }
+
+    // 检查打印服务
+    async function checkPrintService() {
+      const statusEl = document.getElementById('serviceStatus');
+      const textEl = document.getElementById('serviceStatusText');
+
+      textEl.textContent = '检查中...';
+      statusEl.className = 'service-status';
+
+      try {
+        const isOnline = await ShippingPrintClient.checkService();
+
+        if (isOnline) {
+          const printers = await ShippingPrintClient.listPrinters();
+          statusEl.className = 'service-status online';
+          textEl.textContent = `打印服务在线 - 找到 ${printers.length} 台打印机`;
+          showStatus(`✓ 打印服务正常，可用打印机: ${printers.join(', ')}`, true);
+        } else {
+          statusEl.className = 'service-status offline';
+          textEl.textContent = '打印服务离线';
+          showStatus('打印服务未启动，请在本地 Windows 机器上启动打印服务', false);
+        }
+      } catch (error) {
+        statusEl.className = 'service-status offline';
+        textEl.textContent = '打印服务离线';
+        showStatus(`检查失败: ${error.message}`, false);
+      }
+    }
+
+    // 页面加载时自动检查服务状态
+    window.addEventListener('load', () => {
+      checkPrintService();
+    });
+  </script>
+</body>
+</html>
